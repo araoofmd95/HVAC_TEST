@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chatbot</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+    .message { margin-bottom: 10px; }
+    .user { color: blue; }
+    .bot { color: green; }
+  </style>
+</head>
+<body>
+  <h2>My Chatbot</h2>
+  <div id="chat"></div>
+  <input type="text" id="message" placeholder="Type your message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('message');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Display user message
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<div class="message user"><strong>You:</strong> ${text}</div>`;
+
+      input.value = "";
+
+      // Send message to n8n webhook
+      const response = await fetch('https://YOUR-N8N-WEBHOOK-URL-HERE', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await response.json();
+      const reply = data.reply || "No response";
+
+      // Display bot reply
+      chat.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${reply}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
